@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auralis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}?v=2.0">
+</head>
+
+<body>
+    <main id="view-welcome" class="view-container hidden">
+        <div class="welcome-container">
+            <h1>auralis.</h1>
+        </div>
+        <div class="text-container">
+            <p>Your surroundings shape how you focus.</p>
+            <p>Let's find music that fits this moment.</p>
+        </div>
+        <div class="listen-button-container">
+            <button id="listen-button">
+                <img src="{{ url_for('static', filename='ear.png') }}" id="btn-icon" alt="Ear Icon">
+                Listen
+            </button>
+            <p id="time-taken">(takes about 15 seconds)</p>
+        </div>
+    </main>
+
+    <section id="view-listening" class="view-container hidden">
+        <p>Listening to your surroundings...</p>
+    </section>
+
+    <section id="view-analysis" class="view-container">
+        <div class="card">
+            <span class="card-subtitle">This space feels like...</span>
+            <h2 class="card-title">cozy café</h2>
+            
+            <p class="card-description">
+                Soft conversation and a gentle ambience create a comfortable place for focused work today.
+            </p>
+            
+            <div class="tags-container">
+                <span class="tag">voices</span>
+                <span class="tag">background music</span>
+                <span class="tag">relaxed</span>
+            </div>
+            
+            <button class="action-btn">
+                <img src="{{ url_for('static', filename='arrow.png') }}" id="arrow-icon" alt="right arrow">
+                See recommendations
+            </button>
+        </div>
+    </section>
+
+    <section id="view-results" class="view-container hidden">
+    </section>
+
+</body>
+</html>
