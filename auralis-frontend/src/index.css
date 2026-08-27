@@ -1,0 +1,64 @@
+@font-face {
+    font-family: 'Braunch';
+    src: url('./assets/fonts/Braunch.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'SpaceMono';
+    src: url('./assets/fonts/SpaceMonoRegular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Telegraf';
+    src: url('./assets/fonts/TelegrafRegular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Telegraf';
+    src: url('./assets/fonts/TelegrafBold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+:root {
+    --font-logo: 'Braunch', serif;
+    --font-body: 'Telegraf', sans-serif;
+    --body-color: #153243;
+    --body-color2: #284b63;
+    --bg-color: #f4f9e9;
+    --accent: #f2cd5d;
+    --tag: 'SpaceMono', sans-serif;
+}
+
+html, body {
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+
+    background-image: radial-gradient(circle closest-side, #efa7a7 0%, #ffd6d6 90%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    font-family: var(--font-body);
+}
+
+h1 {
+    font-family: var(--font-logo);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html, #root {
+  width: 100%;
+  min-height: 100vh;
+}
