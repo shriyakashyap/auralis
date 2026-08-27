@@ -25,11 +25,26 @@
         </div>
     </main>
 
-    <section id="view-listening" class="view-container hidden">
+    <section id="view-listening" class="view-container">
         <p>Listening to your surroundings...</p>
+
+        <div class="waveform">
+            <!-- adding a lot of bars to animate lol -->
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+
     </section>
 
-    <section id="view-analysis" class="view-container">
+    <section id="view-analysis" class="view-container hidden">
         <div class="card">
             <span class="card-subtitle">This space feels like...</span>
             <h2 class="card-title">cozy café</h2>
@@ -52,6 +67,46 @@
     </section>
 
     <section id="view-results" class="view-container hidden">
+        <div class="card">
+            <h2>Here's what I suggest:</h2>
+            <p id="result-subtitle">Warm, mellow tracks that blend naturally into a relaxed café atmosphere.</p>
+
+            <div class="divider"></div>
+
+        <div class="track-list">
+
+            <div class="track-item">
+                <img src="https://upload.wikimedia.org/wikipedia/en/1/11/V_-_Layover.png?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original" class="track-cover">
+                <div class="track-info">
+                    <span class="track-name">Slow Dancing</span>
+                    <span class="track-artist">V</span>
+                </div>
+            </div>
+
+            <div class="track-item">
+                <img src="https://i.scdn.co/image/ab67616d0000b273e9211a624b3f1105af1aaaee" class="track-cover">
+                <div class="track-info">
+                    <span class="track-name">Dreams</span>
+                    <span class="track-artist">RUBII</span>
+                </div>
+            </div>
+
+            <div class="track-item">
+                <img src="https://i.scdn.co/image/ab67616d0000b27348341e864d4b4881f56f01b4" class="track-cover">
+                <div class="track-info">
+                    <span class="track-name">Valentine</span>
+                    <span class="track-artist">Laufey</span>
+                </div>
+            </div>
+
+        </div>
+
+        <button class="listen-again-btn">
+            <img src="{{ url_for('static', filename='ear.png') }}" alt="Listen" class="btn-icon">
+            Listen again
+        </button>
+
+        </div>
     </section>
 
 </body>

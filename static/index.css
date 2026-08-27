@@ -152,3 +152,133 @@ p {
     display: block;
     transform: translateY(-3px);
 }
+
+#result-subtitle {
+    color: var(--body-color);
+    font-size: 1.2rem;
+    font-weight: normal;
+    line-height: 1.4;
+    margin: 0 0 16px 0;
+    opacity: 0.9;
+}
+
+.divider {
+    height: 1.5px;
+    background-color: #597F99;
+    opacity: 1;
+    margin-bottom: 24px;
+    width: 50%;
+}
+
+.track-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 32px;
+}
+
+.track-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+}
+
+.track-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.track-cover {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.track-name {
+    color: var(--body-color2);
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.track-artist {
+    color: var(--body-color2);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.listen-again-btn {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background-color: transparent;
+    border: 2px solid #163042;
+    border-radius: 15px;
+    color: #163042;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.listen-again-btn .btn-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    transform: translateY(1px);
+}
+
+/* Center alignment for the listening view */
+#view-listening {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+}
+
+/* Waveform container */
+.waveform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 48px;
+}
+
+/* Base bar styles */
+.bar {
+    width: 5px;
+    height: 12px;
+    background-color: #163042; /* Matching dark navy */
+    border-radius: 9999px;
+    animation: bounce 1.2s ease-in-out infinite;
+}
+
+/* Stagger animation timing for an organic wave motion */
+.bar:nth-child(1) { animation-delay: 0.0s; }
+.bar:nth-child(2) { animation-delay: 0.2s; }
+.bar:nth-child(3) { animation-delay: 0.4s; }
+.bar:nth-child(4) { animation-delay: 0.1s; }
+.bar:nth-child(5) { animation-delay: 0.3s; }
+.bar:nth-child(6) { animation-delay: 0.0s; }
+.bar:nth-child(7) { animation-delay: 0.2s; }
+.bar:nth-child(8) { animation-delay: 0.4s; }
+.bar:nth-child(9) { animation-delay: 0.1s; }
+.bar:nth-child(10) { animation-delay: 0.3s; }
+
+/* Pulse/scale animation */
+@keyframes bounce {
+    0%, 100% {
+        height: 10px;
+        transform: scaleY(1);
+    }
+    50% {
+        height: 42px;
+        transform: scaleY(1.1);
+    }
+}
