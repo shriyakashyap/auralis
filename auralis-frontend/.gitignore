@@ -22,3 +22,20 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Dependencies & Environments
+node_modules/
+dist/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Local audio temp files
+auralis-backend/temp_*
+auralis-backend/*.wav
+auralis-backend/*.webm
+
+# System files
+.DS_Store
+.env

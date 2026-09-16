@@ -12,7 +12,7 @@ SCENE_PROFILES = {
             "crowd", "television", "acoustic guitar", "humming"
         ],
         "description": "Soft conversation and a gentle ambience create a comfortable place for focused work today.",
-        "track_description": "Subtle lo-fi textures and mellow jazz chords to keep your thoughts grounded without breaking your train of thought.",
+        "track_description": "Warm acoustic chords, buttery neo-soul vocal runs, and unhurried rhythms designed to blend seamlessly with ceramic clatter and quiet conversation.",
         "tags": ["voices", "background music", "relaxed"],
         "spotify_seed_genres": ["acoustic", "chill", "indie"],
         "tracks": [ 

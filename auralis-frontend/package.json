@@ -4,13 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-  "dev:frontend": "vite",
-  "dev:backend": "cd ../auralis-backend && uvicorn main:app --reload --port 8000",
-  "dev": "concurrently -n \"FRONTEND,BACKEND\" -c \"blue,green\" \"npm run dev:frontend\" \"npm run dev:backend\"",
-  "build": "vite build",
-  "preview": "vite preview"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
+    "concurrently": "^8.2.0",
     "framer-motion": "^13.1.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
