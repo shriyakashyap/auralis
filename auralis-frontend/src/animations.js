@@ -46,6 +46,7 @@ export const revealVariant = {
     opacity: 1,
     y: 0,
     transition: {
+      delay: 1.5,
       duration: 0.8,
       ease: [0.16, 1, 0.3, 1]
     }
@@ -97,7 +98,7 @@ export const slowWelcomeStagger = {
   visible: {
     opacity: 1,
     transition: {
-      delayChildren: 0.9,   // Waits nearly 1s after title begins
+      delayChildren: 1.2,   // Waits nearly 1s after title begins
       staggerChildren: 0.25 // Generous quarter-second gap between lines & button
     }
   }

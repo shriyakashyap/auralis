@@ -12,6 +12,7 @@ import {
   slowItemFade
 } from './animations';
 import './App.css';
+import { bufferToWave } from './audioUtils';
 
 // 1. Welcome Screen
 function WelcomeView({ onStart, animateIntro }) {
@@ -19,7 +20,7 @@ function WelcomeView({ onStart, animateIntro }) {
     <motion.main 
       className="welcome-container"
       variants={cardVariant}
-      initial={animateIntro ? "hidden" : false} // Only animate from hidden on fresh load
+      initial="hidden"
       animate="visible"
     >
       <motion.h1 variants={slowTitleVariant} className="logo-title">
@@ -38,17 +39,24 @@ function WelcomeView({ onStart, animateIntro }) {
           variants={slowItemFade} 
           className="listen-btn" 
           onClick={onStart}
+          whileHover={{ 
+            scale: 1.04,
+            transition: { type: "spring", stiffness: 400, damping: 17 }
+          }}
+          whileTap={{ 
+            scale: 0.96 
+          }}
         >
           <img src="/ear.png" alt="" className="btn-icon" />
           Listen
         </motion.button>
 
         <motion.span variants={slowItemFade} className="subtext">
-          (takes about 15 seconds)
+          (takes about 5 seconds)
         </motion.span>
       </motion.div>
     </motion.main>
-  );
+  )
 }
 
 // 2. Waveform Listening Screen
@@ -73,23 +81,35 @@ function ListeningView() {
 }
 
 // 3. Analysis Space Card
-function AnalysisView({ onNext }) {
+function AnalysisView({ vibe, description, tags, onNext }) {
   return (
     <section className="view-container">
       <motion.div className="analysis-card" variants={cardVariant} initial = "hidden" animate="visible">
 
         <motion.span variants={setupVariant} animate="visible" className="card-subtitle">This space feels like...</motion.span>
-        <motion.h2 variants={revealVariant} className="card-title">cozy café</motion.h2>
+        <motion.h2 variants={revealVariant} className="card-title">{vibe}</motion.h2>
         <motion.div variants={detailsStagger}>
           <motion.p variants={itemFade} className="card-description">
-            Soft conversation and a gentle ambience create a comfortable place for focused work today.
+            {description}
           </motion.p>
           <div className="tags-container">
-            <motion.span className="tag" variants={itemFade}>voices</motion.span>
-            <motion.span className="tag" variants={itemFade}>background music</motion.span>
-            <motion.span className="tag" variants={itemFade}>relaxed</motion.span>
+            {tags.map((tag, i) => (
+            <motion.span key={i} variants={itemFade} className="tag">
+              {tag}
+            </motion.span>
+           ))}
           </div>
-          <motion.button variants={itemFade} className="action-btn" onClick={onNext}>
+          <motion.button 
+          variants={itemFade}
+          className="action-btn"
+          onClick={onNext}
+          whileHover={{ 
+            backgroundColor: "#163042", 
+            color: "#f1f6eb",
+            transition: { duration: 0.2, ease: "easeInOut" }
+          }}
+          whileTap={{ scale: 0.96 }}
+          >
             <img src="/arrow.png" alt="" className="btn-icon" />
             See recommendations
           </motion.button>
@@ -100,13 +120,13 @@ function AnalysisView({ onNext }) {
 }
 
 // 4. Recommendation Results Card
-function ResultsView({ onReset, tracks }) {
+function ResultsView({ onReset, tracks, track_description }) {
   return (
     <section className="view-container">
       <motion.div variants={cardVariant} initial="hidden" animate="visible" className="results-card">
         <motion.h2 variants={setupVariant} animate="visible" className="result-title">Here’s what I suggest:</motion.h2>
         <motion.p variants={revealVariant} className="result-subtitle">
-          Warm, mellow tracks that blend naturally into a relaxed café atmosphere.
+          {track_description}
         </motion.p>
         <div className="divider"></div>
 
@@ -122,10 +142,18 @@ function ResultsView({ onReset, tracks }) {
           ))}
         </motion.div>
 
-        <button className="listen-again-btn" onClick={onReset}>
+        <motion.button 
+        className="listen-again-btn"
+        onClick={onReset}
+        whileHover={{ 
+          backgroundColor: "#163042", 
+          color: "#f1f6eb",
+          transition: { duration: 0.2, ease: "easeInOut" }
+        }}
+        >
           <img src="/ear.png" alt="" className="btn-icon" />
           Listen again
-        </button>
+        </motion.button>
       </motion.div>
     </section>
   );
@@ -147,33 +175,79 @@ const pageVariants = {
 // Main App Orchestrator
 export default function App() {
   const [currentView, setCurrentView] = useState('welcome');
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
-  const dummyTracks = [
-    { 
-      title: 'Slow Dancing', 
-      artist: 'V', 
-      cover: 'https://upload.wikimedia.org/wikipedia/en/1/11/V_-_Layover.png' 
-    },
-    { 
-      title: 'Dreams', 
-      artist: 'RUBII', 
-      cover: 'https://i.scdn.co/image/ab67616d0000b273e9211a624b3f1105af1aaaee' 
-    },
-    { 
-      title: 'Valentine', 
-      artist: 'Laufey', 
-      cover: 'https://i.scdn.co/image/ab67616d0000b27348341e864d4b4881f56f01b4' 
-    }
-  ];
+  const [analysisResult, setAnalysisResult] = useState({
+    vibe: "quiet study",
+    description: "",
+    tags: [],
+    tracks: []
+  });
 
-  const handleStartListening = () => {
+  const handleStartListening = async() => {
     setCurrentView('listening');
-    // Simulates a 3-second audio recording step
-    setTimeout(() => {
-      setCurrentView('analysis');
-    }, 3000);
-  };
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+    const source = audioCtx.createMediaStreamSource(stream);
+    
+    // Create a processor node
+    const processor = audioCtx.createScriptProcessor(4096, 1, 1);
+    const audioBuffers = [];
+
+    processor.onaudioprocess = (e) => {
+      const channelData = e.inputBuffer.getChannelData(0);
+      audioBuffers.push(new Float32Array(channelData));
+    };
+
+    source.connect(processor);
+    processor.connect(audioCtx.destination);
+
+    // Record for 5 seconds
+    setTimeout(async () => {
+      // Disconnect and release mic
+      source.disconnect();
+      processor.disconnect();
+      stream.getTracks().forEach((track) => track.stop());
+
+      // Merge collected Float32 buffers into an AudioBuffer
+      const totalLength = audioBuffers.reduce((acc, b) => acc + b.length, 0);
+      const audioBuffer = audioCtx.createBuffer(1, totalLength, audioCtx.sampleRate);
+      const finalData = audioBuffer.getChannelData(0);
+      
+      let offset = 0;
+      for (const chunk of audioBuffers) {
+        finalData.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      // Convert to legitimate WAV
+      const wavBlob = bufferToWave(audioBuffer, totalLength);
+      const formData = new FormData();
+      formData.append("file", wavBlob, "recording.wav");
+
+      try {
+        const response = await fetch("http://localhost:8000/api/analyze", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+        const data = await response.json();
+        setAnalysisResult(data);
+      } catch (err) {
+        console.error("Backend error, falling back:", err);
+      } finally {
+        audioCtx.close();
+        setCurrentView('analysis');
+      }
+    }, 5000);
+
+  } catch (err) {
+    console.error("Microphone initialization failed:", err);
+    setCurrentView('welcome');
+  }
+};
 
 return (
     <div className="app-shell">
@@ -185,13 +259,12 @@ return (
             key="welcome"
             className="view-wrapper"
             variants={pageVariants}
-            initial="initial"
-            animate="animate"
+            initial="hidden"
+            animate="visible"
             exit="exit"
           >
             <WelcomeView 
-              onStart={handleStartListening} 
-              animateIntro={isFirstLoad} 
+              onStart={handleStartListening}
             />
           </motion.div>
         )}
@@ -220,7 +293,13 @@ return (
             exit="exit"
             transition={springTransition}
           >
-            <AnalysisView onNext={() => setCurrentView('results')} />
+
+          <AnalysisView 
+            vibe={analysisResult.vibe}
+            description={analysisResult.description}
+            tags={analysisResult.tags}
+            onNext={() => setCurrentView('results')} 
+          />
           </motion.div>
         )}
 
@@ -234,10 +313,12 @@ return (
             exit="exit"
             transition={springTransition}
           >
-            <ResultsView 
-              onReset={() => setCurrentView('welcome')} 
-              tracks={dummyTracks} 
-            />
+          
+          <ResultsView
+            track_description={analysisResult.track_description}
+            tracks={analysisResult.tracks}
+            onReset={() => setCurrentView('welcome')} 
+          />
           </motion.div>
         )}
       </AnimatePresence>
