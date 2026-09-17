@@ -75,6 +75,7 @@ npm run dev
 ```
 
 **Client**: (http://localhost:5173)
+
 **API Docs**: (http://localhost:8000/docs)
 
 *First Run Note: When you trigger your first recording, PyTorch and Hugging Face will download the ~350 MB AST model weights. Subsequent runs load directly from your local cache.*
