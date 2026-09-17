@@ -4,15 +4,20 @@ import random
 SCENE_PROFILES = {
     "cozy café": {
     "strong_triggers": [
-            "speech", "music", "babble", "conversation", "chatter",
-            "dishes", "cutlery", "tableware", "cup", "coffee", 
-            "espresso", "restaurant", "clatter", "laughter"
+            # In-store & ambient music cues
+            "background music", "music", "ambient music", "easy listening", 
+            "acoustic guitar", "piano", "jazz",
+            
+            # Dining & coffee prep
+            "cutlery, silverware", "dishes, pots, and pans", "cupboard open or close",
+            "coffee", "espresso machine", "cup", "tableware", 
+            "chatter", "babble", "laughter", "restaurant"
         ],
         "weak_triggers": [
-            "crowd", "television", "acoustic guitar", "humming"
+            "whispering", "indoor"
         ],
         "description": "Soft conversation and a gentle ambience create a comfortable place for focused work today.",
-        "track_description": "Warm acoustic chords, buttery neo-soul vocal runs, and unhurried rhythms designed to blend seamlessly with ceramic clatter and quiet conversation.",
+        "track_description": "Soft acoustic strums and warm jazzy grooves that tuck into background chatter and ceramic clatter.",
         "tags": ["voices", "background music", "relaxed"],
         "spotify_seed_genres": ["acoustic", "chill", "indie"],
         "tracks": [ 
@@ -43,47 +48,7 @@ SCENE_PROFILES = {
             }
         ]
     },
-    "bustling commute": {
-        "strong_triggers": [
-            "traffic", "bus", "train", "subway", "rail transport", "rail", 
-            "truck", "car", "horn", "siren", "road", "motor vehicle"
-        ],
-        "weak_triggers": [
-            "rumble", "engine", "hum", "wind", "whoosh"
-        ],
-        "description": "Dynamic movement and rhythmic city noise to keep your momentum high.",
-        "track_description": "Propulsive tempos, syncopated basslines, and uptempo electronic jazz to match the city's pulse.",
-        "tags": ["motion", "urban", "energetic"],
-        "spotify_seed_genres": ["electronic", "ambient", "techno"],
-            "tracks": [
-            {
-                "title": "Serenade (KARINA & WINTER)",
-                "artist": "aespa",
-                "cover": "https://images.genius.com/e575050aa188fe7e11ea50ecaed82ef0.1000x1000x1.png"
-            },
-            {
-                "title": "Take me home",
-                "artist": "PinkPantheress",
-                "cover": "https://i.scdn.co/image/ab67616d0000b27357d764a60898b1e4fa65e857"
-            },
-            {
-                "title": "Super",
-                "artist": "SEVENTEEN",
-                "cover": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Seventeen_-_FML.png?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original"
-            },
-            {
-                "title": "Dracula",
-                "artist": "Tame Impala",
-                "cover": "https://i.scdn.co/image/ab67616d0000b273208500450dcd0fd294d7bd3b"
-            },
-            {
-                "title": "New Jeans",
-                "artist": "NewJeans",
-                "cover": "https://media.pitchfork.com/photos/64af1fe75185b039bca7cf77/1:1/w_1400,h_1400,c_limit/NewJeans%20-%20Get%20Up.jpeg"
-            }
-        ]
-    },
-    "quiet study": {
+    "quiet work": {
         "strong_triggers": [
             "silence", "typing", "computer keyboard", "whispering", "clock", "tick", "page turn"
         ],
@@ -122,21 +87,23 @@ SCENE_PROFILES = {
         ]
     },
     "open outdoors": {
-        "strong_triggers": [
-            # Birds & wildlife
-            "bird", "bird vocalization", "chirp, tweet", "crow", "pigeon, dove",
-            "animal", "insects", "cricket", "cicada",
+    "strong_triggers": [
+            # AudioSet's labels for wind pressure and mic buffet
+            "wind", "wind noise (microphone)", "howl", "rustling leaves", 
+            "whoosh, swoosh, swish", "explosion", "burst, pop", "thump",
             
-            # Weather & organic elements
-            "wind", "breeze", "rustling leaves", "rain", "raindrop", 
-            "water", "stream", "trickle, dribble", "fountain",
+            # Nature & life
+            "bird", "bird vocalization, bird call, bird song", "chirp, tweet",
+            "crow", "pigeon, dove", "animal", "insect", "cricket", "frog",
+            "cat", "meow", "dog", "bark",
             
-            # Open-air human activity (without transit)
-            "footsteps", "gravel", "lawn mower", "children playing", 
-            "playground", "park", "skateboarding"
+            # Weather & atmosphere
+            "rain", "raindrop", "stream", "water", "waterfall", 
+            "footsteps", "cheering", "children playing", "child speech, kid speaking"
         ],
         "weak_triggers": [
-            "dog", "bark", "pant", "distant", "splash", "cheering", "ambient"
+            # Speech is fine outdoors, but only as a low-weight background cue
+            "speech", "conversation", "whispering", "noise", "white noise"
         ],
         "description": "Natural elements, fresh air, and organic sounds that connect you to open green space.",
         "track_description": "Sun-drenched indie folk, fingerpicked guitars, and gentle organic rhythms to accompany the open air.",
@@ -170,27 +137,31 @@ def map_audio_to_vibe(predictions: list):
     scores = {scene: 0.0 for scene in SCENE_PROFILES}
 
     for item in predictions:
-        label = item["label"]
-        prob = item["score"]
+        label = item["label"].lower()
+        prob = float(item["score"])
 
         for scene, data in SCENE_PROFILES.items():
-            # Strong matches multiply the model's confidence by 3
-            if any(t in label for t in data["strong_triggers"]):
-                scores[scene] += prob * 3.0
-            # Weak matches contribute directly
-            elif any(t in label for t in data["weak_triggers"]):
-                scores[scene] += prob * 1.0
+            # Check strong triggers
+            if any(t in label for t in data.get("strong_triggers", [])):
+                weight = 6.0 if scene == "open outdoors" else 2.5
+                scores[scene] += prob * weight
+
+            # Check weak triggers
+            elif any(t in label for t in data.get("weak_triggers", [])):
+                # If outdoor, let speech count toward the outdoor ambiance
+                weight = 1.5 if scene == "open outdoors" else 0.5
+                scores[scene] += prob * weight
 
     print("\n--- WEIGHTED SCENE SCORES ---")
     for s, score in scores.items():
-        print(f"{s}: {round(score, 3)}")
+        print(f"{s}: {round(score, 4)}")
     print("-----------------------------\n")
 
     best_scene = max(scores, key=scores.get)
 
-    # Threshold barrier: if the highest active score isn't at least 0.25, it's genuinely quiet
-    if scores[best_scene] < 0.02:
-        best_scene = "quiet study"
+    # Only fall back to quiet work if literally nothing was detected
+    if scores[best_scene] < 0.01:
+        best_scene = "quiet work"
 
     selected_profile = SCENE_PROFILES[best_scene]
     selected_tracks = random.sample(selected_profile["tracks"], min(len(selected_profile["tracks"]), 3))
