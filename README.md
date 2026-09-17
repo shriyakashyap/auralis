@@ -51,6 +51,7 @@ cd auralis
 ```
 
 2. Set up backend
+
 Ensure Python 3.10+ is installed.
 
 ```bash
@@ -83,6 +84,7 @@ npm run dev
 ## Troubleshooting
 
 Microphone Access: Ensure your browser is granted permission to access your audio input device at http://localhost:5173.
+
 PyAV / FFmpeg Compilation: If building PyAV on macOS fails during dependency resolution, ensure FFmpeg headers are available via Homebrew:
 
 ```bash
