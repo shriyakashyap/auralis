@@ -73,7 +73,7 @@ auralis/
 1. Clone the repository:
 
 ```bash
-git clone [https://github.com/shriyakashyap/auralis.git](https://github.com/shriyakashyap/auralis.git)
+git clone https://github.com/shriyakashyap/auralis.git auralis
 cd auralis
 ```
 
