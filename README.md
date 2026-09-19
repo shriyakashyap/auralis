@@ -2,14 +2,39 @@
 
 Auralis is an ambient, audio-reactive web app that samples your surrounding room audio, classifies environmental acoustics using an Audio Spectrogram Transformer (AST), and serves curated music recommendations to match your space.
 
+> **Note:** This project is currently a standalone proof-of-concept (PoC) focused on real-time environmental sound classification and contextual acoustic mapping.
+
 ---
 
-## Features
+## How It Works
 
-* **Real-time Environmental Classification:** Runs an AST fine-tuned on Google's AudioSet (527 hierarchical sound ontology classes) via Hugging Face.
-* **Context-Aware Scene Mapping:** Distinguishes between subtle indoor and outdoor atmospheres using a weighted trigger heuristic across scenes like **Cozy Café**, **Open Outdoors**, and **Quiet Work**.
-* **Streamlined Developer Experience:** Single-command startup from the repository root via `concurrently`—no need to manage separate terminal tabs for frontend and backend servers.
-* **Responsive UI:** Built with React, Vite, and Framer Motion for clean visual feedback.
+Auralis turns your room's physical audio environment into curated musical recommendations through a four-stage classification pipeline:
+
+```
+
+[ Browser Mic ] ──> [ Audio Normalization ] ──> [ AST Transformer ] ──> [ Heuristic Vibe Mapper ] ──> [ Music Recommendation ]
+
+```
+
+1. **Ambient Audio Capture:**
+   The frontend records a short sample of environmental room sound using the Web Audio API (`MediaRecorder`) and sends the raw audio payload to the FastAPI backend.
+
+2. **Spectrogram Preprocessing:**
+   The backend normalizes the audio stream to a 16 kHz mono format via PyAV. It converts the waveform into a log-mel spectrogram, the frequency-over-time visual representation that audio transformers process.
+
+3. **Inference with AST (Audio Spectrogram Transformer):**
+   The spectrogram is passed into an AST model pre-trained and fine-tuned on Google's AudioSet ontology (527 distinct acoustic sound classes). The model evaluates patterns in the spectrogram to output probabilistic confidence scores across potential sound events (e.g., *whispering*, *keyboard typing*, *cutlery clatter*, *wind noise*, *background music*).
+
+4. **Context-Aware Heuristic Mapping:**
+   Raw audio predictions are matched against a weighted trigger matrix in `mapper.py`:
+   * **Cozy Café:** Demands indoor dining cues (silverware, porcelain, coffee preparation) or ambient music.
+   * **Open Outdoors:** Responds to organic wind buffeting, foliage rustle, water elements, and distant wildlife.
+   * **Quiet Work:** Prioritizes subtle indoor keyboard clicks, writing, and low room tone—falling back to this mode whenever room acoustic energy sits below active environment thresholds.
+
+5. **Curated Track Delivery:**
+   Once a target vibe is resolved, Auralis samples tailored tracks and thematic metadata matched to the mood, returning them to the React client alongside active confidence metrics.
+
+```
 
 ---
 
@@ -91,3 +116,17 @@ PyAV / FFmpeg Compilation: If building PyAV on macOS fails during dependency res
 ```bash
 brew install ffmpeg
 ```
+
+## Current Limitations
+
+* **Curated Track Pool (Static):** Rather than generating algorithmic recommendations tailored to an individual user's listening history (like Spotify or Apple Music), songs are sampled from static, hand-curated track pools mapped to each vibe in `mapper.py`.
+* **Limited Environment Profiles:** The system currently recognizes only three primary acoustic settings: **Quiet Work**, **Cozy Café**, and **Open Outdoors**.
+* **Acoustic Edge Cases & Misclassifications:** Microphone sensitivity, background noise leakage, and hardware gain can lead to occasional false positives—for example, distant cars driving past an open window generating a "whoosh" sound that tricks the model into detecting an indoor room as the outdoors.
+* **Platform Architecture:** The project is currently deployed as a local web app rather than a native mobile application, meaning it relies on browser-level microphone access rather than native mobile background listening.
+
+## Future Roadmap
+
+* **Expanded Environment Profiles:** Adding granular spaces such as libraries, bustling transit/commutes, gyms, and rainy interiors.
+* **Spotify Web API Integration:** Authenticating user accounts via OAuth to generate dynamic playlists based on personal listening tastes rather than hardcoded lists.
+* **Native Mobile App:** Transitioning to React Native or Swift to allow seamless, low-power background listening on mobile devices.
+* **Acoustic Calibration:** Letting users tune threshold sensitivity to adapt to their specific room and microphone setup.
