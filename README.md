@@ -4,6 +4,10 @@ Auralis is an ambient, audio-reactive web app that samples your surrounding room
 
 > **Note:** This project is currently a standalone proof-of-concept (PoC) focused on real-time environmental sound classification and contextual acoustic mapping.
 
+## Demo
+
+🎬 **[demo video](https://drive.google.com/file/d/15EBtt1vtatnkqE1OqMcF7aijavkaMIhJ/view?usp=sharing)**
+
 ---
 
 ## How It Works
@@ -33,8 +37,6 @@ Auralis turns your room's physical audio environment into curated musical recomm
 
 5. **Curated Track Delivery:**
    Once a target vibe is resolved, Auralis samples tailored tracks and thematic metadata matched to the mood, returning them to the React client alongside active confidence metrics.
-
-```
 
 ---
 
