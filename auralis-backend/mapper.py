@@ -49,11 +49,16 @@ SCENE_PROFILES = {
         ]
     },
     "quiet work": {
-        "strong_triggers": [
-            "silence", "typing", "computer keyboard", "whispering", "clock", "tick", "page turn"
+    "strong_triggers": [
+            # Keyboard, typing, and mouse interactions
+            "typing", "computer keyboard", "click", "clicking",
+            
+            # Domestic room / quiet study cues
+            "whispering", "silence", "room", "hum", "air conditioning",
+            "page turning", "paper", "pen", "writing"
         ],
         "weak_triggers": [
-            "breathing", "rustle"
+            "speech", "white noise", "noise", "static"
         ],
         "description": "Minimal distraction and gentle stillness designed for deep immersion.",
         "tags": ["silent", "low-energy", "minimal"],
@@ -143,14 +148,14 @@ def map_audio_to_vibe(predictions: list):
         for scene, data in SCENE_PROFILES.items():
             # Check strong triggers
             if any(t in label for t in data.get("strong_triggers", [])):
-                weight = 6.0 if scene == "open outdoors" else 2.5
+                weight = 3.0 if scene == "open outdoors" else 2.5
                 scores[scene] += prob * weight
 
             # Check weak triggers
             elif any(t in label for t in data.get("weak_triggers", [])):
                 # If outdoor, let speech count toward the outdoor ambiance
                 weight = 1.5 if scene == "open outdoors" else 0.5
-                scores[scene] += prob * weight
+                scores[scene] += prob * 0.3
 
     print("\n--- WEIGHTED SCENE SCORES ---")
     for s, score in scores.items():
@@ -160,7 +165,7 @@ def map_audio_to_vibe(predictions: list):
     best_scene = max(scores, key=scores.get)
 
     # Only fall back to quiet work if literally nothing was detected
-    if scores[best_scene] < 0.01:
+    if scores[best_scene] < 0.15:
         best_scene = "quiet work"
 
     selected_profile = SCENE_PROFILES[best_scene]
